@@ -1,15 +1,15 @@
 #include "dbscan.h"
 
-int DBSCAN::run()
-{
-    int clusterID = 1;
+int DBSCAN::run() {
+    int clusterID = 1; // current cluster id
     vector<Point>::iterator iter;
-    for(iter = m_points.begin(); iter != m_points.end(); ++iter)
-    {
-        if ( iter->clusterID == UNCLASSIFIED )
-        {
-            if ( expandCluster(*iter, clusterID) != FAILURE )
-            {
+    // iterate through all points
+    for (iter = m_points.begin(); iter != m_points.end(); ++iter) {
+        // only analyze unprocessed points
+        if ( iter->clusterID == UNCLASSIFIED ) {
+            // try to expand the cluster using this point
+            if ( expandCluster(*iter, clusterID) != FAILURE ) {
+                // move on to next cluster if the point led to a cluster formation
                 clusterID += 1;
             }
         }
@@ -18,46 +18,50 @@ int DBSCAN::run()
     return 0;
 }
 
-int DBSCAN::expandCluster(Point point, int clusterID)
-{    
+int DBSCAN::expandCluster(Point point, int clusterID) {
+    // returns a vector of indices of the initial neighbors of 'point' - seed set
     vector<int> clusterSeeds = calculateCluster(point);
 
-    if ( clusterSeeds.size() < m_minPoints )
-    {
+    if ( clusterSeeds.size() < m_minPoints ) { // cannot be considered a part of a cluster
+        // not a core point, so it is noise - cannot be expanded further
         point.clusterID = NOISE;
         return FAILURE;
     }
-    else
-    {
+    else {
         int index = 0, indexCorePoint = 0;
         vector<int>::iterator iterSeeds;
-        for( iterSeeds = clusterSeeds.begin(); iterSeeds != clusterSeeds.end(); ++iterSeeds)
-        {
+        // analyze each neighbor point (includes the core point) of the core point - iterating through seed set
+        for ( iterSeeds = clusterSeeds.begin(); iterSeeds != clusterSeeds.end(); ++iterSeeds) {
+            // accessing the neighbor point using its index, assign it to the cluster
             m_points.at(*iterSeeds).clusterID = clusterID;
-            if (m_points.at(*iterSeeds).x == point.x && m_points.at(*iterSeeds).y == point.y && m_points.at(*iterSeeds).z == point.z )
-            {
+            // if we are looking at the core point - mark its index as the core point index
+            if (m_points.at(*iterSeeds).x == point.x && m_points.at(*iterSeeds).y == point.y && m_points.at(*iterSeeds).z == point.z ) {
                 indexCorePoint = index;
             }
             ++index;
         }
-        clusterSeeds.erase(clusterSeeds.begin()+indexCorePoint);
+        // Removes from the vector either a single element (position) or a range of elements ([first,last))
+        // removing the core point from the vector of cluster seeds
+        clusterSeeds.erase(clusterSeeds.begin() + indexCorePoint);
 
-        for( vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i )
-        {
+        // vector with size 0 - runs until vector is size of clusterSeeds vector
+        for ( vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i ) {
+            // finding the neighbors of the current cluster neighbor point (neighbors of neighbors)
             vector<int> clusterNeighors = calculateCluster(m_points.at(clusterSeeds[i]));
 
-            if ( clusterNeighors.size() >= m_minPoints )
-            {
+            // if current neighbor point can be considered a core point as well
+            if ( clusterNeighors.size() >= m_minPoints ) {
                 vector<int>::iterator iterNeighors;
-                for ( iterNeighors = clusterNeighors.begin(); iterNeighors != clusterNeighors.end(); ++iterNeighors )
-                {
-                    if ( m_points.at(*iterNeighors).clusterID == UNCLASSIFIED || m_points.at(*iterNeighors).clusterID == NOISE )
-                    {
-                        if ( m_points.at(*iterNeighors).clusterID == UNCLASSIFIED )
-                        {
+                // iterate through its neighbors
+                for ( iterNeighors = clusterNeighors.begin(); iterNeighors != clusterNeighors.end(); ++iterNeighors ) {
+                    // if any of those neighbors were previously classified as noise or are still unclassified
+                    if ( m_points.at(*iterNeighors).clusterID == UNCLASSIFIED || m_points.at(*iterNeighors).clusterID == NOISE ) {
+                        if ( m_points.at(*iterNeighors).clusterID == UNCLASSIFIED ) {
+                            // add to seeds vector (the for-loop currently running will now need to access this point as well)
                             clusterSeeds.push_back(*iterNeighors);
-                            n = clusterSeeds.size();
+                            n = clusterSeeds.size(); // update the with the new size of clusterSeeds
                         }
+                        // assign this neighbor-of-neighbor point as apart of the current cluster
                         m_points.at(*iterNeighors).clusterID = clusterID;
                     }
                 }
@@ -68,15 +72,15 @@ int DBSCAN::expandCluster(Point point, int clusterID)
     }
 }
 
-vector<int> DBSCAN::calculateCluster(Point point)
-{
+vector<int> DBSCAN::calculateCluster(Point point) {
     int index = 0;
     vector<Point>::iterator iter;
     vector<int> clusterIndex;
-    for( iter = m_points.begin(); iter != m_points.end(); ++iter)
-    {
-        if ( calculateDistance(point, *iter) <= m_epsilon )
-        {
+    // run through all data points
+    for (iter = m_points.begin(); iter != m_points.end(); ++iter) {
+        // *iter is address of current point
+        if (calculateDistance(point, *iter) <= m_epsilon ) {
+            // add index of point to the cluster index
             clusterIndex.push_back(index);
         }
         index++;
@@ -84,8 +88,7 @@ vector<int> DBSCAN::calculateCluster(Point point)
     return clusterIndex;
 }
 
-inline double DBSCAN::calculateDistance( Point pointCore, Point pointTarget )
-{
+inline double DBSCAN::calculateDistance( Point pointCore, Point pointTarget ) {
     return pow(pointCore.x - pointTarget.x,2)+pow(pointCore.y - pointTarget.y,2)+pow(pointCore.z - pointTarget.z,2);
 }
 
