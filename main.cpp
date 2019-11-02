@@ -22,7 +22,7 @@ void readBenchmarkData(vector<Point>& points) {
     while (i < num_points) {
         // Reads data from the stream and stores them according to the parameter
         // format into the locations pointed by the additional arguments
-        fscanf(stream, "%f,%f,%f,%d\n", &(p[i].x), &(p[i].y), &(p[i].z), &cluster);
+        fscanf(stream, "%f,%f,%f,%d\n", &(p[i].x), &(p[i].y), &cluster);
 
         // assign all points as unclassified
         p[i].clusterID = UNCLASSIFIED;
@@ -39,13 +39,13 @@ void readBenchmarkData(vector<Point>& points) {
 void printResults(vector<Point>& points, int num_points) {
     int i = 0;
     printf("Number of points: %u\n"
-           " x     y     z     cluster_id\n"
+           " x     y     cluster_id\n"
            "-----------------------------\n"
             , num_points);
     while (i < num_points) {
-        printf("%5.2lf %5.2lf %5.2lf: %d\n",
+        printf("%5.2lf %5.2lf: %d\n",
                points[i].x,
-               points[i].y, points[i].z,
+               points[i].y,
                points[i].clusterID);
         ++i;
     }
@@ -54,18 +54,26 @@ void printResults(vector<Point>& points, int num_points) {
 
 int main() {
     vector<Point> points;
-
     // read point data
     readBenchmarkData(points);
 
+    float pointArray [points.size()][4]; // array to pass in
+
+    for (int i = 0; i < points.size(); ++i) {
+        pointArray[i][0] = points.at(i).x;
+        pointArray[i][1] = points.at(i).y;
+        pointArray[i][2] = points.at(i).xVel;
+        pointArray[i][3] = points.at(i).yVel;
+    }
+
     // constructor
-    DBSCAN ds(MINIMUM_POINTS, EPSILON, points);
+    DBSCAN ds(MINIMUM_POINTS, EPSILON, pointArray);
 
     // main loop
     ds.run();
 
     // result of DBSCAN algorithm
-    printResults(ds.m_points, ds.getTotalPointSize());
+//    printResults(ds.m_points, ds.getTotalPointSize());
 
     return 0;
 }

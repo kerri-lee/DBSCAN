@@ -15,13 +15,14 @@ using namespace std;
 
 typedef struct Point_
 {
-    float x, y, z;  // X, Y, Z position
+    float x, y;  // X, Y position
+    float xVel, yVel // X, Y velocity
     int clusterID;  // clustered ID
 }Point;
 
 class DBSCAN {
 public:    
-    DBSCAN(unsigned int minPts, float eps, vector<Point> points){
+    DBSCAN(unsigned int minPts, float eps, float *points){
         m_minPoints = minPts;
         m_epsilon = eps;
         m_points = points;
@@ -29,19 +30,23 @@ public:
     }
     ~DBSCAN(){}
 
-    int run();
+    int* run();
     vector<int> calculateCluster(Point point);
     int expandCluster(Point point, int clusterID);
     inline double calculateDistance(Point pointCore, Point pointTarget);
+    void printResults(float* points, int numClusters, int maxClusterSize);
 
     int getTotalPointSize() {return m_pointSize;}
     int getMinimumClusterSize() {return m_minPoints;}
     int getEpsilonSize() {return m_epsilon;}
 private:
-    vector<Point> m_points;
+    float* m_points;
+    vector<Point> points;
+    int numClusters;
     unsigned int m_pointSize;
     unsigned int m_minPoints;
     float m_epsilon;
+    int maxClusterSize;
 };
 
 #endif // DBSCAN_H
