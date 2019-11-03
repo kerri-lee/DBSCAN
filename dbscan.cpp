@@ -1,6 +1,6 @@
 #include "dbscan.h"
 
-int* DBSCAN::run() {
+float* DBSCAN::run() {
     int clusterID = 1; // current cluster id
     numClusters = 0;
     int rows = sizeof(m_points) / sizeof(m_points[0]);
@@ -29,8 +29,8 @@ int* DBSCAN::run() {
         }
     }
     // 3D array
-    float toReturn[numClusters][maxClusterSize][4] = {};
-    int currSizes[numClusters] = {};
+    float* toReturn = new float[numClusters][maxClusterSize][4];
+    int* currSizes = new int[numClusters];
 
     // after processing, convert vector to 3D array
     // 1st dimension: cluster id
@@ -46,7 +46,8 @@ int* DBSCAN::run() {
             ++currSizes[id - 1];
         }
     }
-    printResults(toReturn, numClusters, maxClusterSize);
+//    printResults(toReturn, numClusters, maxClusterSize);
+    delete[] currSizes;
     return toReturn;
 }
 
@@ -127,29 +128,17 @@ inline double DBSCAN::calculateDistance( Point pointCore, Point pointTarget ) {
     return pow(pointCore.x - pointTarget.x,2) + pow(pointCore.y - pointTarget.y,2);
 }
 
-void DBSCAN::printResults(float* points, int numClusters, int maxClusterSize) {
-//    int i = 0;
-//    printf("Number of points: %u\n"
-//           " x     y     cluster_id\n"
-//           "-----------------------------\n"
-//            , num_points);
-//    while (i < num_points) {
-//        printf("%5.2lf %5.2lf: %d\n",
-//               points[i].x,
-//               points[i].y,
-//               points[i].clusterID);
-//        ++i;
+//void DBSCAN::printResults(float* points, int numClusters, int maxClusterSize) {
+//    for (int i = 0; i < numClusters; ++i) {
+//        for (int j = 0; j < maxClusterSize; ++j) {
+//            printf("%5.2lf %5.2lf %5.2lf %5.2lf: %d\n",
+//            points[i][j][0],
+//            points[i][j][1],
+//            points[i][j][2],
+//            points[i][j][3],
+//            i);
+//        }
 //    }
-    for (int i = 0; i < numClusters; ++i) {
-        for (int j = 0; j < maxClusterSize; ++j) {
-            printf("%5.2lf %5.2lf %5.2lf %5.2lf: %d\n",
-            points[i][j][0],
-            points[i][j][1],
-            points[i][j][2],
-            points[i][j][3],
-            i);
-        }
-    }
-}
+//}
 
 

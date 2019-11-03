@@ -10,8 +10,7 @@ void readBenchmarkData(vector<Point>& points) {
     FILE *stream;
     stream = fopen ("benchmark_hepta.dat","ra");
 
-    unsigned int minpts, num_points, cluster, i = 0;
-    double epsilon;
+    unsigned int num_points, cluster, i = 0;
 
     // First line read in is the number of points in the data set
     fscanf(stream, "%u\n", &num_points);
@@ -22,7 +21,7 @@ void readBenchmarkData(vector<Point>& points) {
     while (i < num_points) {
         // Reads data from the stream and stores them according to the parameter
         // format into the locations pointed by the additional arguments
-        fscanf(stream, "%f,%f,%f,%d\n", &(p[i].x), &(p[i].y), &cluster);
+        fscanf(stream, "%f,%f,%d\n", &(p[i].x), &(p[i].y), &cluster);
 
         // assign all points as unclassified
         p[i].clusterID = UNCLASSIFIED;
@@ -57,9 +56,9 @@ int main() {
     // read point data
     readBenchmarkData(points);
 
-    float pointArray [points.size()][4]; // array to pass in
+    float *pointArray = new float[static_cast<int>(points.size())][4]; // array to pass in
 
-    for (int i = 0; i < points.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(points.size()); ++i) {
         pointArray[i][0] = points.at(i).x;
         pointArray[i][1] = points.at(i).y;
         pointArray[i][2] = points.at(i).xVel;
@@ -71,7 +70,7 @@ int main() {
 
     // main loop
     ds.run();
-
+    delete[] pointArray;
     // result of DBSCAN algorithm
 //    printResults(ds.m_points, ds.getTotalPointSize());
 
