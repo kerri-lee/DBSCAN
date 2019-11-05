@@ -1,10 +1,11 @@
 #include "dbscan.h"
 
-float* DBSCAN::run() {
+float* DBSCAN::run() { // return type shoudl be float** since toReturn is an array of float*
     int clusterID = 1; // current cluster id
-    numClusters = 0;
-    int rows = sizeof(m_points) / sizeof(m_points[0]);
-    maxClusterSize = 0;
+    numClusters = 0;  // const numClusters = 0;
+    int rows = sizeof(m_points) / sizeof(m_points[0]); // this will evaluate to 1 
+                                                       // since m_points and m_points[0] are both pointers
+    maxClusterSize = 0;  // const maxClusterSize = 0;
 
     // create vector of points from 2D array
     for (int r = 0; r < rows; ++r) {
@@ -17,25 +18,32 @@ float* DBSCAN::run() {
 
     vector<Point>::iterator iter;
     // iterate through all points
+    
+    // int *numClusPtr = &numClusters;
+    // we create a pointer to circumvent const rules
     for (iter = points.begin(); iter != points.end(); ++iter) {
         // only analyze unprocessed points
         if ( iter->clusterID == UNCLASSIFIED ) {
             // try to expand the cluster using this point
             if ( expandCluster(*iter, clusterID) != FAILURE ) {
-                numClusters++;
+                numClusters++;  // change to *numClusPtr++;
                 // move on to next cluster if the point led to a cluster formation
                 clusterID += 1;
             }
         }
     }
     // 3D array
+    // declaring variables as const makes these declarations legal
     float* toReturn = new float[numClusters][maxClusterSize][4];
-    int* currSizes = new int[numClusters];
+    int* currSizes = new int[numClusters]; // when do these values get initialized??
 
     // after processing, convert vector to 3D array
     // 1st dimension: cluster id
     // 2nd dimension: points
     // 3rd dimension: point data
+    
+    // for (auto iter : points) { just a cleaner way of declaring iterator
+    
     for (iter = points.begin(); iter != points.end(); ++iter) {
         int id = iter->clusterID;
         if (id != NOISE) {
@@ -43,7 +51,7 @@ float* DBSCAN::run() {
             toReturn[id - 1][currSizes[id - 1]][1] = iter->y;
             toReturn[id - 1][currSizes[id - 1]][2] = iter->xVel;
             toReturn[id - 1][currSizes[id - 1]][3] = iter->yVel;
-            ++currSizes[id - 1];
+            ++currSizes[id - 1]; // shoudln't this line go at beginning of loop? Or at least before initializing toReturn vals
         }
     }
 //    printResults(toReturn, numClusters, maxClusterSize);
