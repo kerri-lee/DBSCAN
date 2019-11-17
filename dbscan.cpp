@@ -13,6 +13,8 @@ int DBSCAN::run()
             if ( expandCluster(*iter, clusterID) != FAILURE ) {
                 // move on to next cluster if the point led to a cluster formation
                 clusterID += 1;
+            } else { // expansion of point failed
+                iter->clusterID = NOISE;
             }
         }
     }
@@ -27,7 +29,6 @@ int DBSCAN::expandCluster(Point point, int clusterID)
     if ( clusterSeeds.size() < m_minPoints )
     { // cannot be considered a part of a cluster
         // not a core point, so it is noise - cannot be expanded further
-        point.clusterID = NOISE;
         return FAILURE;
     }
     else {
