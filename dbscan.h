@@ -17,36 +17,35 @@ typedef struct Point_
 {
     float x, y;  // X, Y position
     float xVel, yVel; // X, Y velocity
-    int clusterID;  // clustered ID
+    int clusterID;  // cluster ID
 }Point;
 
 class DBSCAN {
 public:    
-    DBSCAN(unsigned int minPts, float eps, float points[]){
+    DBSCAN(unsigned int minPts, float eps, vector<Point> points)
+    {
         m_minPoints = minPts;
         m_epsilon = eps;
-        *m_points = points;
-        m_pointSize = sizeof(points)/sizeof(points[0]);
+        m_points = points;
+        m_pointSize = points.size();
     }
+
     ~DBSCAN(){}
 
-    float* run();
+    int run();
     vector<int> calculateCluster(Point point);
     int expandCluster(Point point, int clusterID);
-    inline double calculateDistance(Point pointCore, Point pointTarget);
-    void printResults(float* points, int numClusters, int maxClusterSize);
+    inline float calculateDistance(Point pointCore, Point pointTarget);
 
     int getTotalPointSize() {return m_pointSize;}
     int getMinimumClusterSize() {return m_minPoints;}
     float getEpsilonSize() {return m_epsilon;}
+
+    vector<Point> m_points;
 private:
-    vector<Point> points;
-    int numClusters;
     unsigned int m_pointSize;
     unsigned int m_minPoints;
     float m_epsilon;
-    int maxClusterSize;
-    float **m_points;
 };
 
 #endif // DBSCAN_H

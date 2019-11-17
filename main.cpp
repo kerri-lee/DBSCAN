@@ -1,78 +1,88 @@
 #include <stdio.h>
 #include <iostream>
 #include "dbscan.h"
+#include "dbscan.cpp"
 
 #define MINIMUM_POINTS 4     // minimum number of cluster
-#define EPSILON (0.75*0.75)  // distance for clustering, metre^2
+#define EPSILON (0.5*0.5)  // distance for clustering, metre^2
 
-void readBenchmarkData(vector<Point>& points) {
+void readBenchmarkData(vector<Point>& points)
+{
     // load point cloud
     FILE *stream;
-    stream = fopen ("benchmark_hepta.dat","ra");
+    stream = fopen ("test_data_one.dat","r"); // may require full file path!
 
-    unsigned int num_points, cluster, i = 0;
-
-    // First line read in is the number of points in the data set
-    fscanf(stream, "%u\n", &num_points);
-
-    // Allocating memory (initialize to 0) for array of pointers
-    Point *p = (Point *)calloc(num_points, sizeof(Point));
-
-    while (i < num_points) {
+    unsigned int num_points = 0;
+    if (stream != NULL)
+    {
+        // Allocating memory (inizialize to 0) for a Point
+        Point *p = (Point *)calloc(1, sizeof(Point));
         // Reads data from the stream and stores them according to the parameter
         // format into the locations pointed by the additional arguments
-        fscanf(stream, "%f,%f,%d\n", &(p[i].x), &(p[i].y), &cluster);
+        while (fscanf(stream, "%f,%f,%f,%f\n", &(p->x), &(p->y), &(p->xVel), &(p->yVel)) != EOF) {
+            // assign all points as unclassified
+            p->clusterID = UNCLASSIFIED;
 
-        // assign all points as unclassified
-        p[i].clusterID = UNCLASSIFIED;
-
-        // Adds a new element at the end of the vector, after its current last element
-        // The content of p[i] is copied (or moved) to the new element
-        points.push_back(p[i]);
-        ++i;
+            // Adds a new element at the end of the vector, after its current last element
+            // The content of p[i] is copied (or moved) to the new element
+            points.push_back(*p);
+            ++num_points;
+        }
+        free(p);
+        fclose(stream);
+    } else {
+        printf("Cannot find file\n");
     }
-    free(p);
-    fclose(stream);
 }
 
-void printResults(vector<Point>& points, int num_points) {
+void printResults(vector<Point>& points, int num_points)
+{
+// For printing the results to std out
+//    int i = 0;
+//    printf("Number of points: %u\n"
+//           " x     y     xvel     yvel     cluster_id\n"
+//           "-----------------------------------------\n"
+//            , num_points);
+//    while (i < num_points)
+//    {
+//        printf("%5.2lf %5.2lf  %5.2lf   %5.2lf:     %d\n",
+//               points[i].x,
+//               points[i].y,
+//               points[i].xVel,
+//               points[i].yVel,
+//               points[i].clusterID);
+//        ++i;
+//    }
+
+// For print the results to a .dat file (only coordinates and clusterID)
     int i = 0;
-    printf("Number of points: %u\n"
-           " x     y     cluster_id\n"
-           "-----------------------------\n"
-            , num_points);
-    while (i < num_points) {
-        printf("%5.2lf %5.2lf: %d\n",
-               points[i].x,
-               points[i].y,
-               points[i].clusterID);
-        ++i;
+    FILE *stream;
+    stream = fopen ("test_data_one_results.dat","w"); // may require full file path!
+    if (stream != NULL) {
+        while (i < num_points) {
+            fprintf(stream, "%5.5lf,%5.5lf,%d\n",
+                    points[i].x,
+                    points[i].y,
+                    points[i].clusterID);
+            ++i;
+        }
     }
-
 }
 
-int main() {
+int main()
+{
     vector<Point> points;
     // read point data
     readBenchmarkData(points);
 
-    float *pointArray = new float[static_cast<int>(points.size())][4]; // array to pass in
-
-    for (int i = 0; i < static_cast<int>(points.size()); ++i) {
-        pointArray[i][0] = points.at(i).x;
-        pointArray[i][1] = points.at(i).y;
-        pointArray[i][2] = points.at(i).xVel;
-        pointArray[i][3] = points.at(i).yVel;
-    }
-
     // constructor
-    DBSCAN ds(MINIMUM_POINTS, EPSILON, pointArray);
+    DBSCAN ds(MINIMUM_POINTS, EPSILON, points);
 
     // main loop
     ds.run();
-    delete[] pointArray;
+
     // result of DBSCAN algorithm
-//    printResults(ds.m_points, ds.getTotalPointSize());
+    printResults(ds.m_points, ds.getTotalPointSize());
 
     return 0;
 }
