@@ -4,13 +4,13 @@
 #include "dbscan.cpp"
 
 #define MINIMUM_POINTS 4     // minimum number of cluster
-#define EPSILON (0.5*0.5)  // distance for clustering, metre^2
+#define EPSILON (2*2)  // distance for clustering, metre^2
 
 void readBenchmarkData(vector<Point>& points)
 {
     // load point cloud
     FILE *stream;
-    stream = fopen ("test_data_one.dat","r"); // may require full file path!
+    stream = fopen ("test_data_two.dat","r"); // may require full file path!
 
     unsigned int num_points = 0;
     if (stream != NULL)
@@ -57,7 +57,7 @@ void printResults(vector<Point>& points, int num_points)
 // For print the results to a .dat file (only coordinates and clusterID)
     int i = 0;
     FILE *stream;
-    stream = fopen ("test_data_one_results.dat","w"); // may require full file path!
+    stream = fopen ("test_data_two_results.dat","w"); // may require full file path!
     if (stream != NULL) {
         while (i < num_points) {
             fprintf(stream, "%5.5lf,%5.5lf,%d\n",
@@ -76,13 +76,13 @@ int main()
     readBenchmarkData(points);
 
     // constructor
-    DBSCAN ds(MINIMUM_POINTS, EPSILON, points);
+    DBSCAN ds(MINIMUM_POINTS, EPSILON, &points);
 
     // main loop
     ds.run();
 
     // result of DBSCAN algorithm
-    printResults(ds.m_points, ds.getTotalPointSize());
+    printResults(points, ds.getTotalPointSize());
 
     return 0;
 }

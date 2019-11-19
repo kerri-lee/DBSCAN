@@ -22,12 +22,12 @@ typedef struct Point_
 
 class DBSCAN {
 public:    
-    DBSCAN(unsigned int minPts, float eps, vector<Point> points)
+    DBSCAN(unsigned int minPts, float eps, vector<Point> *points)
     {
         m_minPoints = minPts;
         m_epsilon = eps;
         m_points = points;
-        m_pointSize = points.size();
+        m_pointSize = points->size();
     }
 
     ~DBSCAN(){}
@@ -41,8 +41,8 @@ public:
     int getMinimumClusterSize() {return m_minPoints;}
     float getEpsilonSize() {return m_epsilon;}
 
-    vector<Point> m_points;
 private:
+    vector<Point> *m_points;
     unsigned int m_pointSize;
     unsigned int m_minPoints;
     float m_epsilon;

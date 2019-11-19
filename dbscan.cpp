@@ -6,7 +6,7 @@ int DBSCAN::run()
     vector<Point>::iterator iter; // create vector of points from 2D array
 
     // iterate through all points
-    for (iter = m_points.begin(); iter != m_points.end(); ++iter) {
+    for (iter = m_points->begin(); iter != m_points->end(); ++iter) {
         // only analyze unprocessed points
         if ( iter->clusterID == UNCLASSIFIED ) {
             // try to expand the cluster using this point
@@ -38,9 +38,9 @@ int DBSCAN::expandCluster(Point point, int clusterID)
         for ( iterSeeds = clusterSeeds.begin(); iterSeeds != clusterSeeds.end(); ++iterSeeds)
         {
             // accessing the neighbor point using its index, assign it to the cluster
-            m_points.at(*iterSeeds).clusterID = clusterID;
+            m_points->at(*iterSeeds).clusterID = clusterID;
             // if we are looking at the core point - mark its index as the core point index
-            if ( m_points.at(*iterSeeds).x == point.x && m_points.at(*iterSeeds).y == point.y)
+            if ( m_points->at(*iterSeeds).x == point.x && m_points->at(*iterSeeds).y == point.y)
             {
                 indexCorePoint = index;
             }
@@ -54,7 +54,7 @@ int DBSCAN::expandCluster(Point point, int clusterID)
         for ( vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i )
         {
             // finding the neighbors of the current cluster neighbor point (neighbors of neighbors)
-            vector<int> clusterNeighbors = calculateCluster(m_points.at(clusterSeeds[i]));
+            vector<int> clusterNeighbors = calculateCluster(m_points->at(clusterSeeds[i]));
 
             // if current neighbor point can be considered a core point as well
             if ( clusterNeighbors.size() >= m_minPoints )
@@ -64,16 +64,16 @@ int DBSCAN::expandCluster(Point point, int clusterID)
                 for ( iterNeighbors = clusterNeighbors.begin(); iterNeighbors != clusterNeighbors.end(); ++iterNeighbors )
                 {
                     // if any of those neighbors were previously classified as noise or are still unclassified
-                    if ( m_points.at(*iterNeighbors).clusterID == UNCLASSIFIED || m_points.at(*iterNeighbors).clusterID == NOISE )
+                    if ( m_points->at(*iterNeighbors).clusterID == UNCLASSIFIED || m_points->at(*iterNeighbors).clusterID == NOISE )
                     {
-                        if ( m_points.at(*iterNeighbors).clusterID == UNCLASSIFIED )
+                        if ( m_points->at(*iterNeighbors).clusterID == UNCLASSIFIED )
                         {
                             // add to seeds vector (the for-loop currently running will now need to access this point as well)
                             clusterSeeds.push_back(*iterNeighbors);
                             n = clusterSeeds.size(); // update the with the new size of clusterSeeds
                         }
                         // assign this neighbor-of-neighbor point as apart of the current cluster
-                        m_points.at(*iterNeighbors).clusterID = clusterID;
+                        m_points->at(*iterNeighbors).clusterID = clusterID;
                     }
                 }
             }
@@ -88,7 +88,7 @@ vector<int> DBSCAN::calculateCluster(Point point)
     vector<Point>::iterator iter;
     vector<int> clusterIndex;
     // run through all data points
-    for ( iter = m_points.begin(); iter != m_points.end(); ++iter)
+    for ( iter = m_points->begin(); iter != m_points->end(); ++iter)
     {
         // *iter is address of current point
         if ( calculateDistance(point, *iter) <= m_epsilon )
