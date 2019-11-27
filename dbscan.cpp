@@ -40,7 +40,7 @@ int DBSCAN::expandCluster(Point point, int clusterID)
             // accessing the neighbor point using its index, assign it to the cluster
             m_points->at(*iterSeeds).clusterID = clusterID;
             // if we are looking at the core point - mark its index as the core point index
-            if ( m_points->at(*iterSeeds).x == point.x && m_points->at(*iterSeeds).y == point.y)
+            if ( m_points->at(*iterSeeds).x == point.x && m_points->at(*iterSeeds).y == point.y && m_points->at(*iterSeeds).z == point.z)
             {
                 indexCorePoint = index;
             }
@@ -103,7 +103,7 @@ vector<int> DBSCAN::calculateCluster(Point point)
 
 inline float DBSCAN::calculateDistance( Point pointCore, Point pointTarget )
 {
-    return pow(pointCore.x - pointTarget.x,2) + pow(pointCore.y - pointTarget.y,2);
+    return pow(pointCore.x - pointTarget.x,2) + pow(pointCore.y - pointTarget.y,2) + pow(pointCore.z - pointTarget.z,2);
 }
 
 

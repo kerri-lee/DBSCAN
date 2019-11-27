@@ -4,13 +4,13 @@
 #include "dbscan.cpp"
 
 #define MINIMUM_POINTS 4     // minimum number of cluster
-#define EPSILON (2*2)  // distance for clustering, metre^2
+#define EPSILON (0.4*0.4)  // distance for clustering, metre^2
 
 void readBenchmarkData(vector<Point>& points)
 {
     // load point cloud
     FILE *stream;
-    stream = fopen ("test_data_two.dat","r"); // may require full file path!
+    stream = fopen ("C:\\Users\\kerri\\OneDrive\\Documents\\University of Washington\\EcoCAR\\DBSCAN-master\\DBSCAN\\test_data_three.dat","r"); // may require full file path!
 
     unsigned int num_points = 0;
     if (stream != NULL)
@@ -19,7 +19,7 @@ void readBenchmarkData(vector<Point>& points)
         Point *p = (Point *)calloc(1, sizeof(Point));
         // Reads data from the stream and stores them according to the parameter
         // format into the locations pointed by the additional arguments
-        while (fscanf(stream, "%f,%f,%f,%f\n", &(p->x), &(p->y), &(p->xVel), &(p->yVel)) != EOF) {
+        while (fscanf(stream, "%f,%f,%f,%f,%f,%f\n", &(p->x), &(p->y), &(p->z), &(p->xVel), &(p->yVel), &(p->zVel)) != EOF) {
             // assign all points as unclassified
             p->clusterID = UNCLASSIFIED;
 
@@ -48,8 +48,10 @@ void printResults(vector<Point>& points, int num_points)
 //        printf("%5.2lf %5.2lf  %5.2lf   %5.2lf:     %d\n",
 //               points[i].x,
 //               points[i].y,
+//               points[i].z,
 //               points[i].xVel,
 //               points[i].yVel,
+//               points[i].zVel,
 //               points[i].clusterID);
 //        ++i;
 //    }
@@ -57,12 +59,13 @@ void printResults(vector<Point>& points, int num_points)
 // For print the results to a .dat file (only coordinates and clusterID)
     int i = 0;
     FILE *stream;
-    stream = fopen ("test_data_two_results.dat","w"); // may require full file path!
+    stream = fopen ("C:\\Users\\kerri\\OneDrive\\Documents\\University of Washington\\EcoCAR\\DBSCAN-master\\DBSCAN\\test_data_three_results.dat","w"); // may require full file path!
     if (stream != NULL) {
         while (i < num_points) {
-            fprintf(stream, "%5.5lf,%5.5lf,%d\n",
+            fprintf(stream, "%5.5lf,%5.5lf,%5.5lf,%d\n",
                     points[i].x,
                     points[i].y,
+                    points[i].z,
                     points[i].clusterID);
             ++i;
         }

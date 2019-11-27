@@ -15,8 +15,8 @@ using namespace std;
 
 typedef struct Point_
 {
-    float x, y;  // X, Y position
-    float xVel, yVel; // X, Y velocity
+    float x, y, z;  // X, Y position
+    float xVel, yVel, zVel; // X, Y velocity
     int clusterID;  // cluster ID
 }Point;
 
