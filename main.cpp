@@ -10,7 +10,7 @@ void readBenchmarkData(vector<Point>& points)
 {
     // load point cloud
     FILE *stream;
-    stream = fopen ("C:\\Users\\kerri\\OneDrive\\Documents\\University of Washington\\EcoCAR\\DBSCAN-master\\DBSCAN\\test_data_three.dat","r"); // may require full file path!
+    stream = fopen ("test_data_three.dat","r"); // may require full file path!
 
     unsigned int num_points = 0;
     if (stream != NULL)
@@ -59,7 +59,7 @@ void printResults(vector<Point>& points, int num_points)
 // For print the results to a .dat file (only coordinates and clusterID)
     int i = 0;
     FILE *stream;
-    stream = fopen ("C:\\Users\\kerri\\OneDrive\\Documents\\University of Washington\\EcoCAR\\DBSCAN-master\\DBSCAN\\test_data_three_results.dat","w"); // may require full file path!
+    stream = fopen ("test_data_three_results.dat","w"); // may require full file path!
     if (stream != NULL) {
         while (i < num_points) {
             fprintf(stream, "%5.5lf,%5.5lf,%5.5lf,%d\n",
